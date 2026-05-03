@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEGEND ALEXANDRIA — حجز التذاكر</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            50: '#FFF9EB',
+                            100: '#FFF0CC',
+                            200: '#FFE099',
+                            300: '#E8C878',
+                            400: '#D4A853',
+                            500: '#C4952E',
+                            600: '#B8922F',
+                            700: '#9A7520',
+                            800: '#7D5E1A',
+                            900: '#5C4513',
+                        },
+                        dark: {
+                            50: '#1A1A1A',
+                            100: '#161616',
+                            200: '#121212',
+                            300: '#0E0E0E',
+                            400: '#0A0A0A',
+                            500: '#060606',
+                        }
+                    },
+                    fontFamily: {
+                        display: ['Playfair Display', 'serif'],
+                        arabic: ['Amiri', 'serif'],
+                        body: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', 'Amiri', sans-serif;
+            background: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #D4A853; border-radius: 3px; }
+
+        .hero-bg {
+            background-image: url('https://z-cdn-media.chatglm.cn/files/8fdf2d6a-8af4-4d69-9ca8-acf8828ab390.png?auth_key=1877835510-6712e5da96214355baaa8738ddde4d43-0-7e70adc4f5d16a00a37cce7867757fdc');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .hero-overlay {
+            background: linear-gradient(to bottom, rgba(5,5,5,0.3) 0%, rgba(5,5,5,0.6) 50%, rgba(5,5,5,0.95) 85%, #050505 100%);
+        }
+
+        .gold-gradient {
+            background: linear-gradient(135deg, #E8C878, #D4A853, #B8922F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gold-glow {
+            box-shadow: 0 0 30px rgba(212, 168, 83, 0.15), 0 0 60px rgba(212, 168, 83, 0.05);
+        }
+
+        .gold-border {
+            border: 1px solid rgba(212, 168, 83, 0.2);
+        }
+
+        .gold-border-hover:hover {
+            border-color: rgba(212, 168, 83, 0.5);
+        }
+
+        .ornament-line {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #D4A853, transparent);
+        }
+
+        .card-bg {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .card-bg:hover {
+            border-color: rgba(212, 168, 83, 0.2);
+            background: rgba(255,255,255,0.04);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse-gold {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(212, 168, 83, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(212, 168, 83, 0); }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .animate-float { animation: float 6s ease-in-out infinite; }
+
+        .shimmer-btn {
+            background: linear-gradient(90deg, #D4A853, #E8C878, #D4A853);
+            background-size: 200% auto;
+            animation: shimmer 3s linear infinite;
+        }
+
+        .pulse-gold { animation: pulse-gold 2s infinite; }
+
+        .ticket-card.selected {
+            border-color: #D4A853 !important;
+            background: rgba(212, 168, 83, 0.08) !important;
+            box-shadow: 0 0 30px rgba(212, 168, 83, 0.1);
+        }
+
+        .date-btn.selected {
+            background: linear-gradient(135deg, #D4A853, #B8922F);
+            color: #000;
+            border-color: #D4A853;
+        }
+
+        .time-btn.selected {
+            background: rgba(212, 168, 83, 0.15);
+            border-color: #D4A853;
+            color: #D4A853;
+        }
+
+        .step-indicator.active {
+            background: linear-gradient(135deg, #D4A853, #B8922F);
+            color: #000;
+        }
+
+        .step-indicator.completed {
+            background: #D4A853;
+            color: #000;
+        }
+
+        .step-line.active {
+            background: #D4A853;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.7) sepia(1) saturate(3) hue-rotate(10deg);
+            cursor: pointer;
+        }
+
+        .toast {
+            animation: fadeInUp 0.4s ease-out forwards;
+        }
+
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .section-visible {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .bg-pattern {
+            background-image: radial-gradient(rgba(212,168,83,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="bg-pattern">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#050505]/70 border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-gold-300 to-gold-600 flex items-center justify-center">
+                    <iconify-icon icon="solar:crown-bold" class="text-black text-sm"></iconify-icon>
+                </div>
+                <span class="font-display text-lg font-bold tracking-wider">LEGEND ALEXANDRIA</span>
+            </div>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#experience" class="text-sm text-neutral-400 hover:text-gold-400 transition-colors duration-300">التجربة</a>
+                <a href="#tickets" class="text-sm text-neutral-400 hover:text-gold-400 transition-colors duration-300">التذاكر</a>
+                <a href="#booking" class="text-sm text-neutral-400 hover:text-gold-400 transition-colors duration-300">الحجز</a>
+                <a href="#gallery" class="text-sm text-neutral-400 hover:text-gold-400 transition-colors duration-300">المعرض</a>
+                <a href="#faq" class="text-sm text-neutral-400 hover:text-gold-400 transition-colors duration-300">الأسئلة</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="scrollToBooking()" class="shimmer-btn text-black font-semibold text-sm px-5 py-2 rounded-full transition-all duration-300 hover:scale-105">
+                    احجز الآن
+                </button>
+                <button onclick="toggleMobileMenu()" class="md:hidden text-neutral-400 hover:text-white">
+                    <iconify-icon icon="solar:hamburger-menu-linear" class="text-2xl"></iconify-icon>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden border-t border-white/5 bg-[#050505]/95 nav-blur">
+            <div class="px-6 py-4 flex flex-col gap-4">
+                <a href="#experience" onclick="toggleMobileMenu()" class="text-sm text-neutral-400 hover:text-gold-400">التجربة</a>
+                <a href="#tickets" onclick="toggleMobileMenu()" class="text-sm text-neutral-400 hover:text-gold-400">التذاكر</a>
+                <a href="#booking" onclick="toggleMobileMenu()" class="text-sm text-neutral-400 hover:text-gold-400">الحجز</a>
+                <a href="#gallery" onclick="toggleMobileMenu()" class="text-sm text-neutral-400 hover:text-gold-400">المعرض</a>
+                <a href="#faq" onclick="toggleMobileMenu()" class="text-sm text-neutral-400 hover:text-gold-400">الأسئلة</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-end pb-20 md:pb-32">
+        <div class="absolute inset-0 hero-bg"></div>
+        <div class="absolute inset-0 hero-overlay"></div>
+
+        <!-- Floating particles -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-1/4 left-1/4 w-1 h-1 bg-gold-400 rounded-full animate-float opacity-40"></div>
+            <div class="absolute top-1/3 right-1/3 w-1.5 h-1.5 bg-gold-300 rounded-full animate-float opacity-30" style="animation-delay: 1s;"></div>
+            <div class="absolute top-1/2 left-1/2 w-1 h-1 bg-gold-400 rounded-full animate-float opacity-50" style="animation-delay: 2s;"></div>
+            <div class="absolute top-2/3 right-1/4 w-2 h-2 bg-gold-300 rounded-full animate-float opacity-20" style="animation-delay: 3s;"></div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-6 w-full">
+            <div class="max-w-3xl">
+                <div class="flex items-center gap-3 mb-6 animate-fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="h-px w-12 bg-gold-400"></div>
+                    <span class="text-gold-400 text-xs font-semibold tracking-[0.3em] uppercase">تجربة تاريخية فريدة</span>
+                </div>
+
+                <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.9] tracking-tight mb-6 animate-fade-in-up" style="animation-delay: 0.4s;">
+                    <span class="block text-white">LEGEND</span>
+                    <span class="block gold-gradient">ALEXANDRIA</span>
+                </h1>
+
+                <p class="text-neutral-400 text-base md:text-lg font-light leading-relaxed max-w-xl mb-10 animate-fade-in-up" style="animation-delay: 0.6s;">
+                    انطلق في رحلة عبر الزمن لاستكشاف أساطير الإسكندرية القديمة. تجربة غامرة تجمع بين التاريخ والحضارة في مشهد بصرية لا يُنسى.
+                </p>
+
+                <div class="flex flex-wrap gap-4 animate-fade-in-up" style="animation-delay: 0.8s;">
+                    <button onclick="scrollToBooking()" class="shimmer-btn text-black font-bold text-sm px-8 py-3.5 rounded-full flex items-center gap-2 transition-all duration-300 hover:scale-105 pulse-gold">
+                        <iconify-icon icon="solar:ticket-bold" class="text-lg"></iconify-icon>
+                        احجز تذكرتك الآن
+                    </button>
+                    <a href="#experience" class="border border-white/10 text-white font-medium text-sm px-8 py-3.5 rounded-full flex items-center gap-2 hover:bg-white/5 transition-all duration-300">
+                        <iconify-icon icon="solar:play-circle-linear" class="text-lg"></iconify-icon>
+                        اكتشف التجربة
+                    </a>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="flex flex-wrap gap-8 mt-12 animate-fade-in-up" style="animation-delay: 1s;">
+                    <div>
+                        <div class="text-2xl font-bold gold-gradient">+50K</div>
+                        <div class="text-neutral-500 text-xs mt-1">زائر هذا الموسم</div>
+                    </div>
+                    <div class="w-px bg-white/10"></div>
+                    <div>
+                        <div class="text-2xl font-bold gold-gradient">4.9</div>
+                        <div class="text-neutral-500 text-xs mt-1">تقييم الزوار</div>
+                    </div>
+                    <div class="w-px bg-white/10"></div>
+                    <div>
+                        <div class="text-2xl font-bold gold-gradient">90 د</div>
+                        <div class="text-neutral-500 text-xs mt-1">مدة التجربة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-fade-in-up" style="animation-delay: 1.2s;">
+            <span class="text-neutral-600 text-[10px] tracking-[0.2em] uppercase">اكتشف المزيد</span>
+            <div class="w-5 h-8 border border-white/10 rounded-full flex justify-center pt-1.5">
+                <div class="w-1 h-2 bg-gold-400 rounded-full animate-bounce"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience" class="py-24 md:py-32">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <span class="text-gold-400 text-xs font-semibold tracking-[0.3em] uppercase">ما الذي ينتظرك</span>
+                <h2 class="font-display text-3xl md:text-5xl font-bold mt-4 tracking-tight">تجربة <span class="gold-gradient">أسطورية</span></h2>
+                <div class="ornament-line w-24 mx-auto mt-6"></div>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Feature 1 -->
+                <div class="card-bg rounded-2xl p-6 transition-all duration-500 group">
+                    <div class="w-12 h-12 rounded-xl bg-gold-400/10 flex items-center justify-center mb-5 group-hover:bg-gold-400/20 transition-colors">
+                        <iconify-icon icon="solar:castle-bold-duotone" class="text-gold-400 text-2xl"></iconify-icon>
+                    </div>
+                    <h3 class="font-display text-lg font-bold mb-3">القلاع التاريخية</h3>
+                    <p class="text-neutral-500 text-sm leading-relaxed">استكشف قلعة قايتباي والمعالم الأثرية في جولة غامرة بتصاوير ثلاثية الأبعاد</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="card-bg rounded-2xl p-6 transition-all duration-500 group">
+                    <div class="w-12 h-12 rounded-xl bg-gold-400/10 flex items-center justify-center mb-5 group-hover:bg-gold-400/20 transition-colors">
+                        <iconify-icon icon="solar:statue-of-liberty-bold-duotone" class="text-gold-400 text-2xl"></iconify-icon>
+                    </div>
+                    <h3 class="font-display text-lg font-bold mb-3">التماثيل الأسطورية</h3>
+                    <p class="text-neutral-500 text-sm leading-relaxed">تعرف على قصة تمثال الإسكندر الأكبر وأعظم شخصيات العصر البطلمي</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="card-bg rounded-2xl p-6 transition-all duration-500 group">
+                    <div class="w-12 h-12 rounded-xl bg-gold-400/10 flex items-center justify-center mb-5 group-hover:bg-gold-400/20 transition-colors">
+                        <iconify-icon icon="solar:water-bold-duotone" class="text-gold-400 text-2xl"></iconify-icon>
+                    </div>
+                    <h3 class="font-display text-lg font-bold mb-3">البحر المتوسط</h3>
+                    <p class="text-neutral-500 text-sm leading-relaxed">مشاهد بانورامية لساحل الإسكندرية كما كانت في العصور القديمة</p>
+                </div>
+                <!-- Feature 4 -->
+                <div class="card-bg rounded-2xl p-6 transition-all duration-500 group">
+                    <div class="w-12 h-12 rounded-xl bg-gold-400/10 flex items-center justify-center mb-5 group-hover:bg-gold-400/20 transition-colors">
+                        <iconify-icon icon="solar:users-group-rounded-bold-duotone" class="text-gold-400 text-2xl"></iconify-icon>
+                    </div>
+                    <h3 class="font-display text-lg font-bold mb-3">شخصيات تاريخية</h3>
+                    <p class="text-neutral-500 text-sm leading-relaxed">تحدث مع كليوباترا والإسكندر عبر تقنيات الذكاء الاصطناعي التفاعلية</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tickets Section -->
+    <section id="tickets" class="py-24 md:py-32 relative">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-gold-400/[0.02] to-transparent pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-16">
+                <span class="text-gold-400 text-xs font-semibold tracking-[0.3em] uppercase">اختر ما يناسبك</span>
+                <h2 class="font-display text-3xl md:text-5xl font-bold mt-4 tracking-tight">أنواع <span class="gold-gradient">التذاكر</span></h2>
+                <div class="ornament-line w-24 mx-auto mt-6"></div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <!-- Standard -->
+                <div class="ticket-card card-bg rounded-2xl p-8 transition-all duration-500 cursor-pointer" onclick="selectTicket('standard')" data-type="standard">
+                    <div class="text-neutral-500 text-xs font-semibold tracking-widest uppercase mb-4">عادي</div>
+                    <div class="flex items-baseline gap-1 mb-2">
+                        <span class="font-display text-4xl font-bold text-white">150</span>
+                        <span class="text-neutral-500 text-sm">ج.م</span>
+                    </div>
+                    <p class="text-neutral-500 text-sm mb-8">تجربة أساسية مع جميع المشاهد</p>
+                    <div class="space-y-3 mb-8">
+                        <div class="flex items-center gap-3 text-sm text-neutral-400">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-gold-400 text-lg flex-shrink-0"></iconify-icon>
+                            دخول التجربة الأساسية
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-neutral-400">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-gold-400 text-lg flex-shrink-0"></iconify-icon>
+                            جولة صوتية مُوجهة
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-neutral-400">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-gold-400 text-lg flex-shrink-0"></iconify-icon>
+                            90 دقيقة من المتعة
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-neutral-600">
+                            <iconify-icon icon="solar:close-circle-linear" class="text-neutral-700 text-lg flex-shrink-0"></iconify-icon>
+                            تجربة VR
+                        </div>
+                    </div>
+                    <button class="w-full py-3 rounded-xl border border-white/10 text-sm font-medium hover:bg-white/5 transition-all duration-300">
+                        اختر هذا
+                    </button>
+                </div>
+
+                <!-- VIP - Featured -->
+                <div class="ticket-card card-bg rounded-2xl p-8 transition-all duration-500 cursor-pointer relative gold-border gold-glow" onclick="selectTicket('vip')" data-type="vip">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 shimmer-btn text-black text-[10px] font-bold tracking-widest uppercase px-4 py-1 rounded-full">
+                        الأكثر طلباً
+                    </div>
+                    <div class="text-gold-400 text-xs font-semibold tracking-widest uppercase mb-4">VIP</div>
+                    <div class="flex items-baseline gap-1 mb-2">
+                        <span class="font-display text-4xl font-bold gold-gradient">300</span>
+                        <span class="text-neutral-500 text-sm">ج.م</span>
+                    </div>
+                    <p class="text-neutral-500 text-sm mb-8">تجربة متقدمة مع إضافات حصرية</p>
+                    <div class="space-y-3 mb-8">
+                        <div class="flex items-center gap-3 text-sm text-neutral-400">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-gold-400 text-lg flex-shrink-0"></iconify-icon>
+                            كل مميزات العادي
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-neutral-400">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-gold-400 text-lg flex-shrink-0"></iconify-icon>
+                            تجربة VR كاملة
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-neutral-400">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-gold-400 text-lg flex-shrink-0"></iconify-icon>
+                            صور تذكارية رقمية
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-neutral-400">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-gold-400 text-lg flex-shrink-0"></iconify-icon>
+                            مقعد مُفضل
+                        </div>
+                    </div>
+                    <button class="w-full py-3 rounded-xl shimmer-btn text-black text-sm font-bold transition-all duration-300 hover:scale-[1.02]">
+                        اختر هذا
+                    </button>
+                </div>
+
+                <!-- Premium -->
+                <div class="ticket-card card-bg rounded-2xl p-8 transition-all duration-500 cursor-pointer" onclick="selectTicket('premium')" data-type="premium">
+                    <div class="text-neutral-500 text-xs font-semibold tracking-widest uppercase mb-4">بريميوم</div>
+                    <div class="flex items-baseline gap-1 mb-2">
+                        <span class="font-display text-4xl font-bold text-white">500</span>
+                        <span class="text-neutral-500 text-sm">ج.م</span>
+                    </div>
+                    <p class="text-neutral-500 text-sm mb-8">تجربة ملكية كاملة بلا حدود</p>
+                    <div class="space-y-3 mb-8">
+                        <div class="flex items-center gap-3 text-sm text-neutral-400">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-gold-400 text-lg flex-shrink-0"></iconify-icon>
+                            كل مميزات VIP
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-neutral-400">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-gold-400 text-lg flex-shrink-0"></iconify-icon>
+                            جولة خاصة مع مرشد
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-neutral-400">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-gold-400 text-lg flex-shrink-0"></iconify-icon>
+                            هدايا تذكارية فاخرة
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-neutral-400">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-gold-400 text-lg flex-shrink-0"></iconify-icon>
+                            دخول مبكر بدون انتظار
+                        </div>
+                    </div>
+                    <button class="w-full py-3 rounded-xl border border-white/10 text-sm font-medium hover:bg-white/5 transition-all duration-300">
+                        اختر هذا
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Section -->
+    <section id="booking" class="py-24 md:py-32">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <span class="text-gold-400 text-xs font-semibold tracking-[0.3em] uppercase">أكمل حجزك</span>
+                <h2 class="font-display text-3xl md:text-5xl font-bold mt-4 tracking-tight">حجز <span class="gold-gradient">التذاكر</span></h2>
+                <div class="ornament-line w-24 mx-auto mt-6"></div>
+            </div>
+
+            <!-- Step Indicators -->
+            <div class="flex items-center justify-center gap-0 mb-12">
+                <div class="flex items-center gap-2">
+                    <div id="step1Ind" class="step-indicator active w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500">1</div>
+                    <span class="text-xs text-neutral-400 hidden sm:inline">التاريخ</span>
+                </div>
+                <div id="stepLine1" class="step-line w-12 md:w-20 h-px bg-neutral-800 mx-3 transition-all duration-500"></div>
+                <div class="flex items-center gap-2">
+                    <div id="step2Ind" class="step-indicator w-8 h-8 rounded-full bg-neutral-800 text-neutral-500 flex items-center justify-center text-xs font-bold transition-all duration-500">2</div>
+                    <span class="text-xs text-neutral-500 hidden sm:inline">التفاصيل</span>
+                </div>
+                <div id="stepLine2" class="step-line w-12 md:w-20 h-px bg-neutral-800 mx-3 transition-all duration-500"></div>
+                <div class="flex items-center gap-2">
+                    <div id="step3Ind" class="step-indicator w-8 h-8 rounded-full bg-neutral-800 text-neutral-500 flex items-center justify-center text-xs font-bold transition-all duration-500">3</div>
+                    <span class="text-xs text-neutral-500 hidden sm:inline">الدفع</span>
+                </div>
+            </div>
+
+            <!-- Booking Card -->
+            <div class="card-bg rounded-3xl p-6 md:p-10 gold-glow">
+                <!-- Step 1: Date & Time -->
+                <div id="step1" class="booking-step">
+                    <h3 class="font-display text-xl font-bold mb-6">اختر التاريخ والوقت</h3>
+
+                    <div class="mb-8">
+                        <label class="text-sm text-neutral-400 mb-3 block">التاريخ</label>
+                        <input type="date" id="bookingDate" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-gold-400/50 transition-colors" onchange="updateAvailableTimes()">
+                    </div>
+
+                    <div class="mb-8">
+                        <label class="text-sm text-neutral-400 mb-3 block">الوقت المتاح</label>
+                        <div id="timeSlots" class="grid grid-cols-3 md:grid-cols-4 gap-3">
+                            <div class="text-center text-neutral-600 text-sm col-span-full py-8">اختر تاريخاً أولاً لعرض الأوقات المتاحة</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <label class="text-sm text-neutral-400 mb-3 block">نوع التذكرة</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="selectTicket('standard')" class="ticket-type-btn py-3 rounded-xl border border-white/10 text-sm transition-all duration-300 hover:bg-white/5" data-type="standard">
+                                <div class="font-bold">عادي</div>
+                                <div class="text-neutral-500 text-xs mt-1">150 ج.م</div>
+                            </button>
+                            <button onclick="selectTicket('vip')" class="ticket-type-btn py-3 rounded-xl border border-gold-400/30 bg-gold-400/5 text-sm transition-all duration-300" data-type="vip">
+                                <div class="font-bold text-gold-400">VIP</div>
+                                <div class="text-gold-400/60 text-xs mt-1">300 ج.م</div>
+                            </button>
+                            <button onclick="selectTicket('premium')" class="ticket-type-btn py-3 rounded-xl border border-white/10 text-sm transition-all duration-300 hover:bg-white/5" data-type="premium">
+                                <div class="font-bold">بريميوم</div>
+                                <div class="text-neutral-500 text-xs mt-1">500 ج.م</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <label class="text-sm text-neutral-400 mb-3 block">عدد التذاكر</label>
+                        <div class="flex items-center gap-4">
+                            <button onclick="changeQty(-1)" class="w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors">
+                                <iconify-icon icon="solar:minus-circle-linear" class="text-lg"></iconify-icon>
+                            </button>
+                            <span id="ticketQty" class="text-2xl font-bold w-8 text-center">1</span>
+                            <button onclick="changeQty(1)" class="w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors">
+                                <iconify-icon icon="solar:add-circle-linear" class="text-lg"></iconify-icon>
+                            </button>
+                            <span class="text-neutral-500 text-sm mr-4">(الحد الأقصى 10 تذاكر)</span>
+                        </div>
+                    </div>
+
+                    <button onclick="goToStep(2)" class="w-full shimmer-btn text-black font-bold py-3.5 rounded-xl text-sm transition-all duration-300 hover:scale-[1.02]">
+                        التالي — تفاصيل الحجز
+                    </button>
+                </div>
+
+                <!-- Step 2: Personal Details -->
+                <div id="step2" class="booking-step hidden">
+                    <h3 class="font-display text-xl font-bold mb-6">بيانات الحجز</h3>
+
+                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="text-sm text-neutral-400 mb-2 block">الاسم الأول</label>
+                            <input type="text" id="firstName" placeholder="أدخل اسمك الأول" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-gold-400/50 transition-colors">
+                        </div>
+                        <div>
+                            <label class="text-sm text-neutral-400 mb-2 block">اسم العائلة</label>
+                            <input type="text" id="lastName" placeholder="أدخل اسم العائلة" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-gold-400/50 transition-colors">
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="text-sm text-neutral-400 mb-2 block">البريد الإلكتروني</label>
+                        <input type="email" id="email" placeholder="example@email.com" dir="ltr" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-gold-400/50 transition-colors">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="text-sm text-neutral-400 mb-2 block">رقم الهاتف</label>
+                        <input type="tel" id="phone" placeholder="01xxxxxxxxx" dir="ltr" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-gold-400/50 transition-colors">
+                    </div>
+
+                    <div class="mb-8">
+                        <label class="text-sm text-neutral-400 mb-2 block">ملاحظات خاصة (اختياري)</label>
+                        <textarea id="notes" rows="3" placeholder="أي طلبات خاصة..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-gold-400/50 transition-colors resize-none"></textarea>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="goToStep(1)" class="px-6 py-3.5 rounded-xl border border-white/10 text-sm font-medium hover:bg-white/5 transition-all duration-300">
+                            رجوع
+                        </button>
+                        <button onclick="goToStep(3)" class="flex-1 shimmer-btn text-black font-bold py-3.5 rounded-xl text-sm transition-all duration-300 hover:scale-[1.02]">
+                            التالي — المراجعة والدفع
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Review & Payment -->
+                <div id="step3" class="booking-step hidden">
+                    <h3 class="font-display text-xl font-bold mb-6">مراجعة الحجز</h3>
+
+                    <!-- Summary -->
+                    <div class="bg-white/[0.03] rounded-2xl p-6 mb-6 space-y-4">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-neutral-500">نوع التذكرة</span>
+                            <span id="reviewType" class="font-medium text-gold-400">VIP</span>
+                        </div>
+                        <div class="h-px bg-white/5"></div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-neutral-500">التاريخ</span>
+                            <span id="reviewDate" class="font-medium">—</span>
+                        </div>
+                        <div class="h-px bg-white/5"></div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-neutral-500">الوقت</span>
+                            <span id="reviewTime" class="font-medium">—</span>
+                        </div>
+                        <div class="h-px bg-white/5"></div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-neutral-500">عدد التذاكر</span>
+                            <span id="reviewQty" class="font-medium">1</span>
+                        </div>
+                        <div class="h-px bg-white/5"></div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-neutral-500">الاسم</span>
+                            <span id="reviewName" class="font-medium">—</span>
+                        </div>
+                        <div class="h-px bg-gold-400/20"></div>
+                        <div class="flex justify-between items-baseline">
+                            <span class="text-neutral-400 font-medium">الإجمالي</span>
+                            <span id="reviewTotal" class="font-display text-2xl font-bold gold-gradient">300 ج.م</span>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="mb-8">
+                        <label class="text-sm text-neutral-400 mb-3 block">طريقة الدفع</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="selectPayment('card')" class="payment-btn py-4 rounded-xl border border-gold-400/30 bg-gold-400/5 flex flex-col items-center gap-2 transition-all duration-300" data-method="card">
+                                <iconify-icon icon="solar:card-bold-duotone" class="text-gold-400 text-2xl"></iconify-icon>
+                                <span class="text-xs font-medium text-gold-400">بطاقة</span>
+                            </button>
+                            <button onclick="selectPayment('wallet')" class="payment-btn py-4 rounded-xl border border-white/10 flex flex-col items-center gap-2 transition-all duration-300 hover:bg-white/5" data-method="wallet">
+                                <iconify-icon icon="solar:wallet-bold-duotone" class="text-neutral-400 text-2xl"></iconify-icon>
+                                <span class="text-xs font-medium text-neutral-400">محفظة</span>
+                            </button>
+                            <button onclick="selectPayment('cash')" class="payment-btn py-4 rounded-xl border border-white/10 flex flex-col items-center gap-2 transition-all duration-300 hover:bg-white/5" data-method="cash">
+                                <iconify-icon icon="solar:money-bag-bold-duotone" class="text-neutral-400 text-2xl"></iconify-icon>
+                                <span class="text-xs font-medium text-neutral-400">كاش</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="goToStep(2)" class="px-6 py-3.5 rounded-xl border border-white/10 text-sm font-medium hover:bg-white/5 transition-all duration-300">
+                            رجوع
+                        </button>
+                        <button onclick="confirmBooking()" id="confirmBtn" class="flex-1 shimmer-btn text-black font-bold py-3.5 rounded-xl text-sm transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2">
+                            <iconify-icon icon="solar:lock-keyhole-bold" class="text-lg"></iconify-icon>
+                            تأكيد الحجز والدفع
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Success -->
+                <div id="success" class="booking-step hidden text-center py-8">
+                    <div class="w-20 h-20 rounded-full bg-gold-400/10 flex items-center justify-center mx-auto mb-6 animate-float">
+                        <iconify-icon icon="solar:check-circle-bold" class="text-gold-400 text-5xl"></iconify-icon>
+                    </div>
+                    <h3 class="font-display text-2xl font-bold mb-3">تم الحجز بنجاح!</h3>
+                    <p class="text-neutral-500 text-sm mb-2">رقم الحجز: <span id="bookingRef" class="text-gold-400 font-mono font-bold">LA-000000</span></p>
+                    <p class="text-neutral-500 text-sm mb-8">تم إرسال تأكيد الحجز على بريدك الإلكتروني</p>
+                    <div class="bg-white/[0.03] rounded-2xl p-6 max-w-sm mx-auto mb-8">
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-neutral-500">التاريخ</span>
+                                <span id="successDate">—</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-neutral-500">الوقت</span>
+                                <span id="successTime">—</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-neutral-500">التذاكر</span>
+                                <span id="successTickets">—</span>
+                            </div>
+                            <div class="h-px bg-white/5"></div>
+                            <div class="flex justify-between">
+                                <span class="text-neutral-400 font-medium">الإجمالي</span>
+                                <span id="successTotal" class="font-bold text-gold-400">—</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="resetBooking()" class="shimmer-btn text-black font-bold px-8 py-3 rounded-xl text-sm transition-all duration-300 hover:scale-105">
+                        حجز تذاكر أخرى
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-24 md:py-32">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <span class="text-gold-400 text-xs font-semibold tracking-[0.3em] uppercase">لقطات من التجربة</span>
+                <h2 class="font-display text-3xl md:text-5xl font-bold mt-4 tracking-tight">المعرض <span class="gold-gradient">الصوري</span></h2>
+                <div class="ornament-line w-24 mx-auto mt-6"></div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="col-span-2 row-span-2 rounded-2xl overflow-hidden group cursor-pointer relative">
+                    <img src="https://picsum.photos/seed/alexandria-castle/800/800" alt="قلعة قايتباي" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6">
+                        <span class="font-display text-lg font-bold">قلعة قايتباي</span>
+                    </div>
+                </div>
+                <div class="rounded-2xl overflow-hidden group cursor-pointer relative aspect-square">
+                    <img src="https://picsum.photos/seed/alexandria-sea/400/400" alt="البحر المتوسط" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4">
+                        <span class="text-sm font-bold">البحر المتوسط</span>
+                    </div>
+                </div>
+                <div class="rounded-2xl overflow-hidden group cursor-pointer relative aspect-square">
+                    <img src="https://picsum.photos/seed/alexandria-statue/400/400" alt="التماثيل" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4">
+                        <span class="text-sm font-bold">التماثيل</span>
+                    </div>
+                </div>
+                <div class="rounded-2xl overflow-hidden group cursor-pointer relative aspect-square">
+                    <img src="https://picsum.photos/seed/alexandria-bridge/400/400" alt="الجسور" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4">
+                        <span class="text-sm font-bold">الجسور القديمة</span>
+                    </div>
+                </div>
+                <div class="rounded-2xl overflow-hidden group cursor-pointer relative aspect-square">
+                    <img src="https://picsum.photos/seed/alexandria-night/400/400" alt="ليلاً" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4">
+                        <span class="text-sm font-bold">الإسكندرية ليلاً</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-24 md:py-32 relative">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-gold-400/[0.015] to-transparent pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-16">
+                <span class="text-gold-400 text-xs font-semibold tracking-[0.3em] uppercase">آراء الزوار</span>
+                <h2 class="font-display text-3xl md:text-5xl font-bold mt-4 tracking-tight">ماذا قالوا <span class="gold-gradient">عنا</span></h2>
+                <div class="ornament-line w-24 mx-auto mt-6"></div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="card-bg rounded-2xl p-6 transition-all duration-500">
+                    <div class="flex gap-1 mb-4">
+                        <iconify-icon icon="solar:star-bold" class="text-gold-400"></iconify-icon>
+                        <iconify-icon icon="solar:star-bold" class="text-gold-400"></iconify-icon>
+                        <iconify-icon icon="solar:star-bold" class="text-gold-400"></iconify-icon>
+                        <iconify-icon icon="solar:star-bold" class="text-gold-400"></iconify-icon>
+                        <iconify-icon icon="solar:star-bold" class="text-gold-400"></iconify-icon>
+                    </div>
+                    <p class="text-neutral-400 text-sm leading-relaxed mb-6">"تجربة لا تُصدق! شعرت فعلاً أنني عشت في عصر الإسكندر الأكبر. التقنية مذهلة والقصة شيقة جداً."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gold-300 to-gold-600 flex items-center justify-center text-black font-bold text-sm">أ</div>
+                        <div>
+                            <div class="text-sm font-medium">أحمد محمد</div>
+                            <div class="text-xs text-neutral-600">تذكرة VIP</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-bg rounded-2xl p-6 transition-all duration-500">
+                    <div class="flex gap-1 mb-4">
+                        <iconify-icon icon="solar:star-bold" class="text-gold-400"></iconify-icon>
+                        <iconify-icon icon="solar:star-bold" class="text-gold-400"></iconify-icon>
+                        <iconify-icon icon="solar:star-bold" class="text-gold-400"></iconify-icon>
+                        <iconify-icon icon="solar:star-bold" class="text-gold-400"></iconify-icon>
+                        <iconify-icon icon="solar:star-bold" class="text-gold-400"></iconify-icon>
+                    </div>
+                    <p class="text-neutral-400 text-sm leading-relaxed mb-6">"حجزت تذكرة بريميوم لعائلتي وكانت التجربة تستحق كل قرش. المرشد كان ممتاز والأطفال أحبوا التجربة."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gold-300 to-gold-600 flex items-center justify-center text-black font-bold text-sm">س</div>
+                        <div>
+                            <div class="text-sm font-medium">سارة علي</div>
+                            <div class="text-xs text-neutral-600">تذكرة بريميوم</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-bg rounded-2xl p-6 transition-all duration-500">
+                    <div class="flex gap-1 mb-4">
+                        <iconify-icon icon="solar:star-bold" class="text-gold-400"></iconify-icon>
+                        <iconify-icon icon="solar:star-bold" class="text-gold-400"></iconify-icon>
+                        <iconify-icon icon="solar:star-bold" class="text-gold-400"></iconify-icon>
+                        <iconify-icon icon="solar:star-bold" class="text-gold-400"></iconify-icon>
+                        <iconify-icon icon="solar:star-half-bold" class="text-gold-400"></iconify-icon>
+                    </div>
+                    <p class="text-neutral-400 text-sm leading-relaxed mb-6">"كنت متشكك في البداية لكن التجربة فاقت توقعاتي. المشاهد البصرية رائعة والأصوات تجعلك تنغمس تماماً."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gold-300 to-gold-600 flex items-center justify-center text-black font-bold text-sm">م</div>
+                        <div>
+                            <div class="text-sm font-medium">محمد حسن</div>
+                            <div class="text-xs text-neutral-600">تذكرة عادية</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-24 md:py-32">
+        <div class="max-w-3xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <span class="text-gold-400 text-xs font-semibold tracking-[0.3em] uppercase">إجابات سريعة</span>
+                <h2 class="font-display text-3xl md:text-5xl font-bold mt-4 tracking-tight">الأسئلة <span class="gold-gradient">الشائعة</span></h2>
+                <div class="ornament-line w-24 mx-auto mt-6"></div>
+            </div>
+
+            <div class="space-y-3" id="faqContainer">
+                <div class="faq-item card-bg rounded-2xl overflow-hidden transition-all duration-500">
+                    <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-right">
+                        <span class="text-sm font-medium">ما هي مدة التجربة؟</span>
+                        <iconify-icon icon="solar:alt-arrow-down-linear" class="text-neutral-500 text-lg transition-transform duration-300 faq-icon"></iconify-icon>
+                    </button>
+                    <div class="faq-answer hidden px-5 pb-5">
+                        <p class="text-neutral-500 text-sm leading-relaxed">مدة التجربة الأساسية 90 دقيقة. تذاكر VIP وبريميوم تشمل وقتاً إضافياً للجولات الخاصة وتجربة VR.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item card-bg rounded-2xl overflow-hidden transition-all duration-500">
+                    <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-right">
+                        <span class="text-sm font-medium">هل يمكنني إلغاء الحجز واسترداد المبلغ؟</span>
+                        <iconify-icon icon="solar:alt-arrow-down-linear" class="text-neutral-500 text-lg transition-transform duration-300 faq-icon"></iconify-icon>
+                    </button>
+                    <div class="faq-answer hidden px-5 pb-5">
+                        <p class="text-neutral-500 text-sm leading-relaxed">نعم، يمكنك إلغاء الحجز قبل 24 ساعة من الموعد واسترداد المبلغ كاملاً. الإلغاء بعد ذلك يخضع لخصم 20%.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item card-bg rounded-2xl overflow-hidden transition-all duration-500">
+                    <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-right">
+                        <span class="text-sm font-medium">هل التجربة مناسبة للأطفال؟</span>
+                        <iconify-icon icon="solar:alt-arrow-down-linear" class="text-neutral-500 text-lg transition-transform duration-300 faq-icon"></iconify-icon>
+                    </button>
+                    <div class="faq-answer hidden px-5 pb-5">
+                        <p class="text-neutral-500 text-sm leading-relaxed">بالتأكيد! التجربة مناسبة لجميع الأعمار من 6 سنوات فأعلى. لدينا محتوى مخصص للأطفال يجمع بين التعليم والترفيه.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item card-bg rounded-2xl overflow-hidden transition-all duration-500">
+                    <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-right">
+                        <span class="text-sm font-medium">هل أحتاج لحجز مسبق؟</span>
+                        <iconify-icon icon="solar:alt-arrow-down-linear" class="text-neutral-500 text-lg transition-transform duration-300 faq-icon"></iconify-icon>
+                    </button>
+                    <div class="faq-answer hidden px-5 pb-5">
+                        <p class="text-neutral-500 text-sm leading-relaxed">ننصح بالحجز المسبق لضمان المكان خاصة في عطلات نهاية الأسبوع. لكن يمكننا استيعاب الزوار بدون حجز حسب التوفر.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item card-bg rounded-2xl overflow-hidden transition-all duration-500">
+                    <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-right">
+                        <span class="text-sm font-medium">أين يقع مقر التجربة؟</span>
+                        <iconify-icon icon="solar:alt-arrow-down-linear" class="text-neutral-500 text-lg transition-transform duration-300 faq-icon"></iconify-icon>
+                    </button>
+                    <div class="faq-answer hidden px-5 pb-5">
+                        <p class="text-neutral-500 text-sm leading-relaxed">نقع في قلب الإسكندرية بجوار مكتبة الإسكندرية، شارع أبو قير. ستجد إرشادات واضحة من كل الاتجاهات.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-24 md:py-32 relative">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="relative rounded-3xl overflow-hidden gold-border gold-glow">
+                <div class="absolute inset-0 bg-gradient-to-br from-gold-400/10 via-transparent to-gold-400/5"></div>
+                <div class="relative z-10 text-center py-16 md:py-20 px-6">
+                    <div class="w-16 h-16 rounded-2xl bg-gold-400/10 flex items-center justify-center mx-auto mb-6 animate-float">
+                        <iconify-icon icon="solar:crown-bold-duotone" class="text-gold-400 text-4xl"></iconify-icon>
+                    </div>
+                    <h2 class="font-display text-3xl md:text-5xl font-bold tracking-tight mb-4">متأكد؟ <span class="gold-gradient">احجز الآن</span></h2>
+                    <p class="text-neutral-500 text-base max-w-lg mx-auto mb-8">الأماكن محدودة والمواعيد تنفد بسرعة. لا تفوّت فرصة العيش في أسطورة الإسكندرية.</p>
+                    <button onclick="scrollToBooking()" class="shimmer-btn text-black font-bold text-sm px-10 py-4 rounded-full transition-all duration-300 hover:scale-105 pulse-gold inline-flex items-center gap-2">
+                        <iconify-icon icon="solar:ticket-bold" class="text-lg"></iconify-icon>
+                        احجز تذكرتك الآن
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 py-16">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-10 mb-12">
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-gold-300 to-gold-600 flex items-center justify-center">
+                            <iconify-icon icon="solar:crown-bold" class="text-black text-sm"></iconify-icon>
+                        </div>
+                        <span class="font-display text-lg font-bold tracking-wider">LEGEND ALEXANDRIA</span>
+                    </div>
+                    <p class="text-neutral-500 text-sm leading-relaxed max-w-sm">تجربة تاريخية غامرة تنقلك عبر الزمن لاستكشاف أساطير الإسكندرية القديمة بأحدث تقنيات العرض التفاعلي.</p>
+                    <div class="flex gap-3 mt-6">
+                        <a href="#" class="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:border-gold-400/30 hover:bg-gold-400/5 transition-all duration-300">
+                            <iconify-icon icon="mdi:facebook" class="text-neutral-400 text-sm"></iconify-icon>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:border-gold-400/30 hover:bg-gold-400/5 transition-all duration-300">
+                            <iconify-icon icon="mdi:instagram" class="text-neutral-400 text-sm"></iconify-icon>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:border-gold-400/30 hover:bg-gold-400/5 transition-all duration-300">
+                            <iconify-icon icon="mdi:twitter" class="text-neutral-400 text-sm"></iconify-icon>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:border-gold-400/30 hover:bg-gold-400/5 transition-all duration-300">
+                            <iconify-icon icon="mdi:youtube" class="text-neutral-400 text-sm"></iconify-icon>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold mb-4">روابط سريعة</h4>
+                    <div class="space-y-3">
+                        <a href="#experience" class="block text-sm text-neutral-500 hover:text-gold-400 transition-colors">التجربة</a>
+                        <a href="#tickets" class="block text-sm text-neutral-500 hover:text-gold-400 transition-colors">التذاكر</a>
+                        <a href="#booking" class="block text-sm text-neutral-500 hover:text-gold-400 transition-colors">الحجز</a>
+                        <a href="#gallery" class="block text-sm text-neutral-500 hover:text-gold-400 transition-colors">المعرض</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold mb-4">تواصل معنا</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2 text-sm text-neutral-500">
+                            <iconify-icon icon="solar:phone-bold-duotone" class="text-gold-400"></iconify-icon>
+                            <span dir="ltr">+20 123 456 7890</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-neutral-500">
+                            <iconify-icon icon="solar:letter-bold-duotone" class="text-gold-400"></iconify-icon>
+                            info@legendalex.com
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-neutral-500">
+                            <iconify-icon icon="solar:map-point-bold-duotone" class="text-gold-400"></iconify-icon>
+                            الإسكندرية، مصر
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="h-px bg-white/5 mb-8"></div>
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-neutral-600 text-xs">© 2025 LEGEND ALEXANDRIA. جميع الحقوق محفوظة.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="text-neutral-600 text-xs hover:text-neutral-400 transition-colors">سياسة الخصوصية</a>
+                    <a href="#" class="text-neutral-600 text-xs hover:text-neutral-400 transition-colors">الشروط والأحكام</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-6 left-6 right-6 md:left-auto md:right-6 md:w-96 z-[100] flex flex-col gap-3"></div>
+
+    <script>
+        // ===== State =====
+        let bookingState = {
+            step: 1,
+            ticketType: 'vip',
+            date: '',
+            time: '',
+            qty: 1,
+            paymentMethod: 'card',
+        };
+
+        const prices = { standard: 150, vip: 300, premium: 500 };
+        const typeNames = { standard: 'عادي', vip: 'VIP', premium: 'بريميوم' };
+
+        const timeSlots = [
+            '09:00 ص', '10:00 ص', '11:00 ص', '12:00 م',
+            '01:00 م', '02:00 م', '03:00 م', '04:00 م',
+            '05:00 م', '06:00 م', '07:00 م', '08:00 م'
+        ];
+
+        // ===== Mobile Menu =====
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        }
+
+        // ===== Scroll to Booking =====
+        function scrollToBooking() {
+            document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ===== Ticket Selection =====
+        function selectTicket(type) {
+            bookingState.ticketType = type;
+
+            // Update ticket cards
+            document.querySelectorAll('.ticket-card').forEach(card => {
+                card.classList.remove('selected');
+                if (card.dataset.type === type) card.classList.add('selected');
+            });
+
+            // Update ticket type buttons in booking
+            document.querySelectorAll('.ticket-type-btn').forEach(btn => {
+                btn.classList.remove('border-gold-400/30', 'bg-gold-400/5');
+                btn.classList.add('border-white/10');
+                btn.querySelector('div:first-child').classList.remove('text-gold-400');
+                btn.querySelector('div:last-child').classList.remove('text-gold-400/60');
+                btn.querySelector('div:first-child').classList.add('text-white');
+                btn.querySelector('div:last-child').classList.add('text-neutral-500');
+
+                if (btn.dataset.type === type) {
+                    btn.classList.add('border-gold-400/30', 'bg-gold-400/5');
+                    btn.classList.remove('border-white/10');
+                    btn.querySelector('div:first-child').classList.add('text-gold-400');
+                    btn.querySelector('div:last-child').classList.add('text-gold-400/60');
+                    btn.querySelector('div:first-child').classList.remove('text-white');
+                    btn.querySelector('div:last-child').classList.remove('text-neutral-500');
+                }
+            });
+        }
+
+        // ===== Date & Time =====
+        function updateAvailableTimes() {
+            const dateInput = document.getElementById('bookingDate');
+            bookingState.date = dateInput.value;
+
+            if (!bookingState.date) return;
+
+            const container = document.getElementById('timeSlots');
+            // Randomly make some slots "unavailable" for realism
+            const available = timeSlots.map(t => ({
+                time: t,
+                available: Math.random() > 0.25
+            }));
+
+            container.innerHTML = available.map(slot =>
+                `<button onclick="selectTime('${slot.time}', this)" 
+                    class="time-btn py-2.5 rounded-xl border text-xs font-medium transition-all duration-300 ${
+                        slot.available 
+                            ? 'border-white/10 text-neutral-400 hover:bg-white/5' 
+                            : 'border-white/5 text-neutral-700 cursor-not-allowed opacity-40'
+                    }" 
+                    ${!slot.available ? 'disabled' : ''}>
+                    ${slot.time}
+                </button>`
+            ).join('');
+        }
+
+        function selectTime(time, el) {
+            bookingState.time = time;
+            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        // ===== Quantity =====
+        function changeQty(delta) {
+            bookingState.qty = Math.max(1, Math.min(10, bookingState.qty + delta));
+            document.getElementById('ticketQty').textContent = bookingState.qty;
+        }
+
+        // ===== Payment Method =====
+        function selectPayment(method) {
+            bookingState.paymentMethod = method;
+            document.querySelectorAll('.payment-btn').forEach(btn => {
+                btn.classList.remove('border-gold-400/30', 'bg-gold-400/5');
+                btn.classList.add('border-white/10');
+                btn.querySelectorAll('iconify-icon, span').forEach(el => {
+                    el.classList.remove('text-gold-400');
+                    el.classList.add('text-neutral-400');
+                });
+            });
+            const active = document.querySelector(`.payment-btn[data-method="${method}"]`);
+            active.classList.add('border-gold-400/30', 'bg-gold-400/5');
+            active.classList.remove('border-white/10');
+            active.querySelectorAll('iconify-icon, span').forEach(el => {
+                el.classList.add('text-gold-400');
+                el.classList.remove('text-neutral-400');
+            });
+        }
+
+        // ===== Steps Navigation =====
+        function goToStep(step) {
+            // Validate before moving forward
+            if (step > bookingState.step) {
+                if (bookingState.step === 1) {
+                    if (!bookingState.date) { showToast('يرجى اختيار التاريخ', 'error'); return; }
+                    if (!bookingState.time) { showToast('يرجى اختيار الوقت', 'error'); return; }
+                }
+                if (bookingState.step === 2) {
+                    const fn = document.getElementById('firstName').value.trim();
+                    const ln = document.getElementById('lastName').value.trim();
+                    const em = document.getElementById('email').value.trim();
+                    const ph = document.getElementById('phone').value.trim();
+                    if (!fn || !ln) { showToast('يرجى إدخال الاسم كاملاً', 'error'); return; }
+                    if (!em || !em.includes('@')) { showToast('يرجى إدخال بريد إلكتروني صحيح', 'error'); return; }
+                    if (!ph || ph.length < 11) { showToast('يرجى إدخال رقم هاتف صحيح', 'error'); return; }
+                }
+            }
+
+            bookingState.step = step;
+
+            // Hide all steps
+            document.querySelectorAll('.booking-step').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`step${step}`).classList.remove('hidden');
+
+            // Update indicators
+            for (let i = 1; i <= 3; i++) {
+                const ind = document.getElementById(`step${i}Ind`);
+                ind.classList.remove('active', 'completed');
+                ind.classList.add('bg-neutral-800', 'text-neutral-500');
+                if (i < step) {
+                    ind.classList.add('completed');
+                    ind.classList.remove('bg-neutral-800', 'text-neutral-500');
+                    ind.innerHTML = '<iconify-icon icon="solar:check-circle-bold" class="text-sm"></iconify-icon>';
+                } else if (i === step) {
+                    ind.classList.add('active');
+                    ind.classList.remove('bg-neutral-800', 'text-neutral-500');
+                    ind.textContent = i;
+                } else {
+                    ind.textContent = i;
+                }
+            }
+
+            // Update step lines
+            document.getElementById('stepLine1').classList.toggle('active', step > 1);
+            document.getElementById('stepLine2').classList.toggle('active', step > 2);
+
+            // Update review if step 3
+            if (step === 3) {
+                const total = prices[bookingState.ticketType] * bookingState.qty;
+                const dateFormatted = new Date(bookingState.date).toLocaleDateString('ar-EG', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                });
+                document.getElementById('reviewType').textContent = typeNames[bookingState.ticketType];
+                document.getElementById('reviewDate').textContent = dateFormatted;
+                document.getElementById('reviewTime').textContent = bookingState.time;
+                document.getElementById('reviewQty').textContent = bookingState.qty;
+                document.getElementById('reviewName').textContent = document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value;
+                document.getElementById('reviewTotal').textContent = total.toLocaleString('ar-EG') + ' ج.م';
+            }
+
+            // Scroll to booking section
+            document.getElementById('booking').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ===== Confirm Booking =====
+        function confirmBooking() {
+            const btn = document.getElementById('confirmBtn');
+            btn.innerHTML = '<div class="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin"></div> جاري المعالجة...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                const ref = 'LA-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+                const total = prices[bookingState.ticketType] * bookingState.qty;
+                const dateFormatted = new Date(bookingState.date).toLocaleDateString('ar-EG', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                });
+
+                document.getElementById('bookingRef').textContent = ref;
+                document.getElementById('successDate').textContent = dateFormatted;
+                document.getElementById('successTime').textContent = bookingState.time;
+                document.getElementById('successTickets').textContent = `${bookingState.qty} × ${typeNames[bookingState.ticketType]}`;
+                document.getElementById('successTotal').textContent = total.toLocaleString('ar-EG') + ' ج.م';
+
+                document.querySelectorAll('.booking-step').forEach(s => s.classList.add('hidden'));
+                document.getElementById('success').classList.remove('hidden');
+
+                btn.innerHTML = '<iconify-icon icon="solar:lock-keyhole-bold" class="text-lg"></iconify-icon> تأكيد الحجز والدفع';
+                btn.disabled = false;
+
+                showToast('تم الحجز بنجاح! رقم الحجز: ' + ref, 'success');
+            }, 2000);
+        }
+
+        // ===== Reset Booking =====
+        function resetBooking() {
+            bookingState = { step: 1, ticketType: 'vip', date: '', time: '', qty: 1, paymentMethod: 'card' };
+
+            document.getElementById('bookingDate').value = '';
+            document.getElementById('ticketQty').textContent = '1';
+            document.getElementById('timeSlots').innerHTML = '<div class="text-center text-neutral-600 text-sm col-span-full py-8">اختر تاريخاً أولاً لعرض الأوقات المتاحة</div>';
+            document.getElementById('firstName').value = '';
+            document.getElementById('lastName').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('notes').value = '';
+
+            selectTicket('vip');
+            selectPayment('card');
+
+            document.querySelectorAll('.booking-step').forEach(s => s.classList.add('hidden'));
+            document.getElementById('step1').classList.remove('hidden');
+
+            for (let i = 1; i <= 3; i++) {
+                const ind = document.getElementById(`step${i}Ind`);
+                ind.classList.remove('active', 'completed');
+                ind.classList.add('bg-neutral-800', 'text-neutral-500');
+                ind.textContent = i;
+            }
+            document.getElementById('step1Ind').classList.add('active');
+            document.getElementById('step1Ind').classList.remove('bg-neutral-800', 'text-neutral-500');
+            document.getElementById('stepLine1').classList.remove('active');
+            document.getElementById('stepLine2').classList.remove('active');
+
+            document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ===== FAQ Toggle =====
+        function toggleFaq(btn) {
+            const item = btn.closest('.faq-item');
+            const answer = item.querySelector('.faq-answer');
+            const icon = item.querySelector('.faq-icon');
+            const isOpen = !answer.classList.contains('hidden');
+
+            // Close all
+            document.querySelectorAll('.faq-answer').forEach(a => a.classList.add('hidden'));
+            document.querySelectorAll('.faq-icon').forEach(i => i.style.transform = 'rotate(0deg)');
+            document.querySelectorAll('.faq-item').forEach(i => {
+                i.classList.remove('gold-border');
+                i.style.background = '';
+            });
+
+            if (!isOpen) {
+                answer.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+                item.classList.add('gold-border');
+                item.style.background = 'rgba(255,255,255,0.03)';
+            }
+        }
+
+        // ===== Toast =====
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const colors = {
+                success: 'border-gold-400/30 bg-gold-400/10',
+                error: 'border-red-400/30 bg-red-400/10',
+                info: 'border-white/10 bg-white/5'
+            };
+            const icons = {
+                success: 'solar:check-circle-bold',
+                error: 'solar:danger-triangle-bold',
+                info: 'solar:info-circle-bold'
+            };
+            const iconColors = {
+                success: 'text-gold-400',
+                error: 'text-red-400',
+                info: 'text-neutral-400'
+            };
+
+            toast.className = `toast flex items-center gap-3 px-5 py-4 rounded-2xl border ${colors[type]} nav-blur`;
+            toast.innerHTML = `
+                <iconify-icon icon="${icons[type]}" class="${iconColors[type]} text-xl flex-shrink-0"></iconify-icon>
+                <span class="text-sm font-medium">${message}</span>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // ===== Set min date to today =====
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('bookingDate').setAttribute('min', today);
+        });
+
+        // ===== Smooth scroll for anchor links =====
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
